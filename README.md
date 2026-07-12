@@ -1,68 +1,64 @@
 # AI PM Resume Agent
 
-一个本地优先的 AI 产品经理求职工作流：把真实项目事实、JD 分析、简历定制、面试准备和投递追踪串成可审计的链路。
+一个本地优先的 AI 产品经理求职工作流。它把真实经历整理成项目证据，结合 JD 做匹配和简历定制，并生成面试准备与投递追踪材料。
 
-本仓库是**公开工作流模板**。它不包含任何候选人的简历、项目材料、JD、联系人、内部指标或输出文件；这些内容全部在本机私有目录中维护，并被 `.gitignore` 排除。
+适合 AI 产品经理、大模型产品经理、Agent 产品经理、AI 应用产品经理和搜索推荐产品经理等岗位。默认面向国内招聘渠道，但不自动投递或发送消息。
 
-## 它解决什么问题
+## 如何运行
 
-- 面向国内 AI PM / 大模型 / Agent / AI 应用 / 搜索推荐等岗位，先做结构化 JD 分析，再决定是否投递。
-- 把每个 JD 关键词映射到真实项目证据、简历优先级和面试风险，避免“关键词硬贴”。
-- 简历定制只改变表达和项目排序，不改变事实内核；`inferred` 和 `hypothesis` 不可进入最终简历。
-- 对投递和 HR 消息保留人工确认：工作流不自动投递、不绕验证码、不做反检测。
-
-## 公开模板与私有数据的边界
-
-| 公开提交 | 仅本地保存 |
-| --- | --- |
-| schema、提示词、校验/导出/看板脚本、模板 CSS | 简历、项目事实与介绍、原始证据、JD、匹配结果、投递记录、仪表盘、PDF/JSON 输出 |
-
-`config/profile.yml`、`config/target.yml`、`profiles/`、`projects/`、`jd/`、`evidence/`、`trackers/`、`dashboards/`、`outputs/`、`market/` 和 `vendor/` 都是本地内容，不会被版本控制。
-
-## 快速开始
+需要 Git；导出/预览简历时还需要 Node.js，启动 Oh My CV 时需要 pnpm。
 
 ```bash
-git clone <your-repository-url>
+git clone https://github.com/XiaohanA2/ai-pm-resume-agent.git
 cd ai-pm-resume-agent
+
+# 创建只保存在本机的简历、配置和投递记录模板；不会覆盖已有文件
 scripts/init_private_workspace
+
+# 检查公开工作流和已存在的私有输入是否符合约定
 scripts/validate_contracts
 ```
 
-初始化脚本只会从 `templates/private-inputs/` 复制缺失的占位文件，**绝不覆盖**已有私有内容。随后用真实信息替换占位内容，并为每个项目建立 `projects/<project-id>/01-facts.yml`。
-
-当私有素材、至少一条 JD 和追踪文件准备好后，运行严格校验：
+完成自己的简历、项目事实和至少一条 JD 后，运行严格检查：
 
 ```bash
 scripts/validate_contracts --require-private-inputs
 ```
 
-## 日常执行顺序
-
-1. 先确认项目事实：阅读 `schemas/enums.yml` 与 `schemas/project_facts.schema.yml`，每项事实标明来源等级和是否允许写进简历。
-2. 把真实 JD 放到 `jd/inbox/`，按 `prompts/02_analyze_jd.md` 规范化岗位字段与风险。
-3. 按 `prompts/03_score_match.md` 输出匹配分、硬门槛、关键词—证据—风险表和建议动作。
-4. 只对 shortlisted JD 按 `prompts/04_tailor_resume.md` 生成定制简历、change log、bullet provenance 与面试风险。
-5. 用 `prompts/05_review_resume.md` 审核；通过后再导入 Oh My CV 预览/导出，并手工确认投递。
-6. 需要投递看板时运行 `scripts/build_trackers`，它会从本地 `trackers/applications.yml` 生成表格和看板。
-
-## 核心命令
+常用命令：
 
 ```bash
-scripts/init_private_workspace
-scripts/validate_contracts
-scripts/validate_contracts --require-private-inputs
+# 根据本地基础简历生成 Oh My CV 导入文件
 scripts/export_for_ohmycv profiles/base_resume.md
+
+# 启动本地 Oh My CV 预览与 PDF 导出页面
 scripts/start_ohmycv
+
+# 从本地投递记录生成 CSV 和看板
 scripts/build_trackers
 ```
 
-`scripts/export_for_ohmycv` 仅生成可导入的本地 JSON；`scripts/start_ohmycv` 启动本地 Oh My CV 页面以预览和导出 PDF。详情见 [OHMYCV_ADAPTER.md](OHMYCV_ADAPTER.md)。
+## 工作流
 
-## 安全和真实性约束
+| 模块 | 作用 | 主要位置 |
+| --- | --- | --- |
+| 1. 项目事实库 | 为每段真实经历记录职责、证据、指标、AI 边界和风险；未确认事实不能写入简历。 | `projects/`、`schemas/project_facts.schema.yml`、`prompts/01_extract_project.md` |
+| 2. JD 解析 | 把岗位拆为领域、用户、任务、AI 要求、指标、硬门槛和风险。 | `jd/inbox/`、`schemas/jd.schema.yml`、`prompts/02_analyze_jd.md` |
+| 3. JD 匹配 | 将 JD 关键词映射到项目证据，输出匹配分、项目排序、缺口和建议动作。 | `trackers/match_scores.yml`、`prompts/03_score_match.md` |
+| 4. 简历定制 | 仅对值得投递的岗位重排项目与 bullet；保留来源记录和变更日志。 | `prompts/04_tailor_resume.md`、`outputs/` |
+| 5. 简历审核 | 检查首屏表达、事实来源和 AI claim 是否经得起面试追问。 | `prompts/05_review_resume.md` |
+| 6. 面试准备 | 围绕主故事、备选故事、风险问题和追问生成面试材料。 | `prompts/06_interview_prep.md` |
+| 7. 投递追踪 | 记录投递状态、下一步动作、简历版本和面试材料。 | `trackers/`、`scripts/build_trackers` |
 
-- 不虚构公司、岗位、项目、学历、指标、上线、获奖或负责人身份。
-- 不把产品策略描述成模型训练或算法工程实现，除非私有事实层明确支持。
-- 不把联系方式、HR 信息、JD 来源、内部指标和原始证据提交到公开仓库。
-- 不自动投递或自动发送消息；任何外部申请均须人工确认。
+推荐顺序：**确认项目事实 → 导入 JD → 匹配评分 → 定制简历 → 审核与 PDF 导出 → 人工投递 → 追踪复盘**。
 
-更完整的执行约束见 [AGENTS.md](AGENTS.md)，字段约束见 `schemas/`，具体作业书见 `prompts/`。
+## 隐私与真实性
+
+本仓库只发布流程、schema、提示词和脚本。你的简历、项目材料、JD、联系人、证据、投递记录和输出文件都在本机保存，且已被 `.gitignore` 排除。
+
+- 不虚构项目、职责、指标、学历或上线结果。
+- `inferred` 和 `hypothesis` 不进入最终简历。
+- 不把产品工作包装成模型训练或算法开发。
+- 不自动投递、不绕过验证码、不自动发送 HR 消息；任何外部操作均需人工确认。
+
+更完整的工作规则见 [AGENTS.md](AGENTS.md)，Oh My CV 本地导出说明见 [OHMYCV_ADAPTER.md](OHMYCV_ADAPTER.md)。
