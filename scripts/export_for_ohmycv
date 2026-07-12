@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+input="${1:-}"
+name="${2:-}"
+output="${3:-}"
+
+if [[ -z "$input" ]]; then
+  echo "Usage: scripts/export_for_ohmycv <resume.md> [resume_name] [output.json]" >&2
+  exit 2
+fi
+
+if [[ ! -f "$input" ]]; then
+  echo "Resume markdown not found: $input" >&2
+  exit 2
+fi
+
+if ! command -v node >/dev/null 2>&1; then
+  echo "Node.js is required to build the Oh My CV import JSON." >&2
+  exit 127
+fi
+
+base="$(basename "$input" .md)"
+if [[ -z "$name" ]]; then
+  name="$base"
+fi
+
+if [[ -z "$output" ]]; then
+  output="outputs/ohmycv_import/${base}.json"
+fi
+
+css_path="templates/ohmycv_resume.css"
+if [[ ! -f "$css_path" ]]; then
+  echo "Oh My CV CSS template not found: $css_path" >&2
+  exit 2
+fi
+
+node - "$input" "$output" "$name" "$css_path" <<'NODE'
+const fs = require("fs");
+const path = require("path");
+
+const [input, output, name, cssPath] = process.argv.slice(2);
+const markdown = fs.readFileSync(input, "utf8");
+const css = fs.readFileSync(cssPath, "utf8");
+const now = Date.now().toString();
+const id = now;
+
+const data = {
+  version: "v1",
+  data: {
+    [id]: {
+      name,
+      markdown,
+      css,
+      styles: {
+        marginV: 46,
+        marginH: 42,
+        lineHeight: 1.25,
+        paragraphSpace: 4,
+        themeColor: "#1f6f9f",
+        fontCJK: {
+          name: "Noto Serif SC"
+        },
+        fontEN: {
+          name: "Arial"
+        },
+        fontSize: 13,
+        paper: "A4"
+      },
+      updated_at: now,
+      created_at: now
+    }
+  }
+};
+
+fs.mkdirSync(path.dirname(output), { recursive: true });
+fs.writeFileSync(output, JSON.stringify(data, null, 2));
+
+const mdOutput = output.replace(/\.json$/i, ".md");
+if (mdOutput !== output) {
+  fs.writeFileSync(mdOutput, markdown);
+}
+
+console.log(`Oh My CV import JSON: ${output}`);
+if (mdOutput !== output) {
+  console.log(`Markdown copy: ${mdOutput}`);
+}
+NODE

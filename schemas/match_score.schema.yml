@@ -1,0 +1,25 @@
+required_fields:
+  - jd_id
+  - fit_score
+  - confidence
+  - decision
+  - hard_gates
+  - evidence_coverage
+  - dimension_scores
+  - recommended_projects
+  - resume_strategy
+  - avoid_claiming
+  - keyword_evidence_risk_table
+  - primary_story
+  - backup_story
+  - risky_story
+  - suggested_action
+
+keyword_evidence_risk_required_fields:
+  - jd_keyword
+  - candidate_evidence
+  - resume_priority
+  - risk
+
+forbidden_fields:
+  - status

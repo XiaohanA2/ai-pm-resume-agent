@@ -1,0 +1,37 @@
+score_scale: "1.0-5.0"
+
+dimensions:
+  - name: AI PM 核心能力
+    weight: 0.25
+    evidence_required: true
+  - name: 业务方向匹配
+    weight: 0.20
+    evidence_required: true
+  - name: 技术理解匹配
+    weight: 0.20
+    evidence_required: true
+  - name: 执行与协作
+    weight: 0.15
+    evidence_required: true
+  - name: 公司/岗位质量
+    weight: 0.10
+    evidence_required: false
+  - name: 风险扣分
+    weight: 0.10
+    evidence_required: false
+
+decisions:
+  apply:
+    min_fit_score: 4.1
+    min_must_have_supported: 0.70
+    allowed_confidence:
+      - high
+      - medium
+  review:
+    min_fit_score: 3.4
+    min_must_have_supported: 0.50
+  archive:
+    triggers:
+      - hard_gate_failed
+      - unacceptable_risk
+      - unsupported_core_requirement

@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+input="${1:-}"
+output="${2:-}"
+
+if [[ -z "$input" ]]; then
+  echo "Usage: scripts/render_resume <resume.md> [output.pdf]" >&2
+  exit 2
+fi
+
+if [[ -z "$output" ]]; then
+  base="$(basename "$input" .md)"
+  output="outputs/resumes_pdf/${base}.pdf"
+fi
+
+cmd="${OH_MY_CV_CMD:-oh-my-cv}"
+
+if ! command -v "$cmd" >/dev/null 2>&1; then
+  base="$(basename "$input" .md)"
+  json_output="outputs/ohmycv_import/${base}.json"
+
+  scripts/export_for_ohmycv "$input" "$base" "$json_output"
+
+  echo "No oh-my-cv CLI was found. Renovamen/oh-my-cv is a local Web app, so PDF export is manual for now." >&2
+  echo "Next steps:" >&2
+  echo "  1. scripts/start_ohmycv --install   # first time only" >&2
+  echo "  2. scripts/start_ohmycv" >&2
+  echo "  3. Import $json_output in Oh My CV and export PDF from the browser." >&2
+  exit 3
+fi
+
+mkdir -p "$(dirname "$output")"
+
+if "$cmd" "$input" --output "$output"; then
+  echo "Rendered $output"
+elif "$cmd" "$input" -o "$output"; then
+  echo "Rendered $output"
+else
+  echo "oh-my-cv command exists but render arguments failed. Update scripts/render_resume for the installed CLI syntax." >&2
+  exit 1
+fi

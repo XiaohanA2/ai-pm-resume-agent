@@ -1,0 +1,196 @@
+#!/usr/bin/env python3
+from pathlib import Path
+import argparse
+import re
+import sys
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def read(path: Path) -> str:
+    try:
+        return path.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        return path.read_text(encoding="utf-8", errors="ignore")
+
+
+def has_key(text: str, key: str) -> bool:
+    return re.search(rf"(?m)^{re.escape(key)}\s*:", text) is not None
+
+
+def check_required(path: Path, text: str, keys: list[str], errors: list[str]) -> None:
+    for key in keys:
+        if not has_key(text, key):
+            errors.append(f"{path.relative_to(ROOT)} missing required key: {key}")
+
+
+def check_no_generic_status(path: Path, text: str, errors: list[str]) -> None:
+    if re.search(r"(?m)^status\s*:", text):
+        errors.append(f"{path.relative_to(ROOT)} uses generic status; use fact_status, rough_status, jd_status, application_stage, or record_status")
+    if re.search(r"(?m)^stage\s*:", text):
+        errors.append(f"{path.relative_to(ROOT)} uses generic stage; use application_stage")
+
+
+def check_project_facts(errors: list[str], notices: list[str], require_private_inputs: bool) -> None:
+    required = [
+        "project_id",
+        "project_name",
+        "fact_status",
+        "period",
+        "role",
+        "confidentiality",
+        "ai_role",
+        "owned_scope",
+        "evaluation_method",
+        "badcase_loop",
+        "human_fallback",
+        "metrics",
+        "action_map",
+    ]
+    paths = sorted((ROOT / "projects").glob("*/01-facts.yml"))
+    if not paths:
+        message = "projects/*/01-facts.yml missing; initialize or add private project facts before scoring a JD"
+        (errors if require_private_inputs else notices).append(message)
+        return
+    for path in paths:
+        text = read(path)
+        check_required(path, text, required, errors)
+        check_no_generic_status(path, text, errors)
+        if "resume_allowed: true" in text and "evidence_level:" not in text:
+            errors.append(f"{path.relative_to(ROOT)} has resume_allowed items without evidence_level")
+
+
+def frontmatter(text: str) -> str:
+    if not text.startswith("---"):
+        return ""
+    parts = text.split("---", 2)
+    if len(parts) < 3:
+        return ""
+    return parts[1]
+
+
+def check_jds(errors: list[str], notices: list[str], require_private_inputs: bool) -> None:
+    required = [
+        "jd_id",
+        "source",
+        "company",
+        "position",
+        "location",
+        "jd_status",
+        "duplicate_key",
+        "risk_flags",
+        "domain",
+        "users",
+        "tasks",
+        "ai_requirements",
+        "metrics",
+    ]
+    paths = sorted((ROOT / "jd").glob("**/*.md"))
+    if not paths:
+        message = "jd/**/*.md missing; add a private JD before generating a match score"
+        (errors if require_private_inputs else notices).append(message)
+        return
+    for path in paths:
+        text = read(path)
+        fm = frontmatter(text)
+        if not fm:
+            errors.append(f"{path.relative_to(ROOT)} missing YAML frontmatter")
+            continue
+        check_required(path, fm, required, errors)
+        check_no_generic_status(path, fm, errors)
+
+
+def check_applications(errors: list[str], notices: list[str], require_private_inputs: bool) -> None:
+    path = ROOT / "trackers" / "applications.yml"
+    if not path.exists():
+        message = "trackers/applications.yml missing; initialize it before tracking applications"
+        (errors if require_private_inputs else notices).append(message)
+        return
+    text = read(path)
+    check_no_generic_status(path, text, errors)
+    if re.search(r"(?m)^\s*-\s*application_id\s*:", text):
+        for key in ["application_stage", "record_status"]:
+            if not has_key(text, key):
+                errors.append(f"trackers/applications.yml contains applications but missing {key}")
+
+
+def check_match_scores(errors: list[str], notices: list[str], require_private_inputs: bool) -> None:
+    path = ROOT / "trackers" / "match_scores.yml"
+    if not path.exists():
+        message = "trackers/match_scores.yml missing; initialize it before saving match scores"
+        (errors if require_private_inputs else notices).append(message)
+        return
+    text = read(path)
+    check_no_generic_status(path, text, errors)
+    if re.search(r"(?m)^\s*-\s*jd_id\s*:", text):
+        required = [
+            "fit_score",
+            "confidence",
+            "decision",
+            "hard_gates",
+            "evidence_coverage",
+            "dimension_scores",
+            "recommended_projects",
+            "resume_strategy",
+            "avoid_claiming",
+            "keyword_evidence_risk_table",
+            "primary_story",
+            "backup_story",
+            "risky_story",
+            "suggested_action",
+        ]
+        check_required(path, text, required, errors)
+
+
+def check_resume_frontmatter(errors: list[str], notices: list[str], require_private_inputs: bool) -> None:
+    path = ROOT / "profiles" / "base_resume.md"
+    if not path.exists():
+        message = "profiles/base_resume.md missing; initialize or add a private base resume before export"
+        (errors if require_private_inputs else notices).append(message)
+        return
+    text = read(path)
+    fm = frontmatter(text)
+    if not fm:
+        errors.append("profiles/base_resume.md missing YAML frontmatter")
+        return
+    for key in ["name", "header"]:
+        if not has_key(fm, key):
+            errors.append(f"profiles/base_resume.md frontmatter missing {key}")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Validate public workflow contracts and any available private inputs.")
+    parser.add_argument(
+        "--require-private-inputs",
+        action="store_true",
+        help="fail when private resume, project, JD, or tracker inputs have not been initialized",
+    )
+    args = parser.parse_args()
+    errors: list[str] = []
+    notices: list[str] = []
+    for rel in ["schemas/enums.yml", "schemas/project_facts.schema.yml", "schemas/jd.schema.yml", "schemas/application.schema.yml", "schemas/match_score.schema.yml"]:
+        if not (ROOT / rel).exists():
+            errors.append(f"{rel} missing")
+
+    check_project_facts(errors, notices, args.require_private_inputs)
+    check_jds(errors, notices, args.require_private_inputs)
+    check_applications(errors, notices, args.require_private_inputs)
+    check_match_scores(errors, notices, args.require_private_inputs)
+    check_resume_frontmatter(errors, notices, args.require_private_inputs)
+
+    if errors:
+        print("Contract validation failed:")
+        for item in errors:
+            print(f"- {item}")
+        return 1
+
+    print("Contract validation passed.")
+    if notices:
+        print("Private-input checks skipped:")
+        for item in notices:
+            print(f"- {item}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

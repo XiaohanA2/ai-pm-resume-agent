@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$root"
+
+copy_if_missing() {
+  local source="$1"
+  local target="$2"
+  if [[ -e "$target" ]]; then
+    echo "Kept existing $target"
+    return
+  fi
+  mkdir -p "$(dirname "$target")"
+  cp "$source" "$target"
+  echo "Created $target"
+}
+
+copy_if_missing templates/private-inputs/profile.example.yml config/profile.yml
+copy_if_missing templates/private-inputs/target.example.yml config/target.yml
+copy_if_missing templates/private-inputs/base_resume.example.md profiles/base_resume.md
+copy_if_missing templates/private-inputs/applications.example.yml trackers/applications.yml
+copy_if_missing templates/private-inputs/match_scores.example.yml trackers/match_scores.yml
+
+mkdir -p evidence/rough_inputs jd/inbox projects outputs dashboards
+echo "Created local-only input directories (if absent)."
+echo "Next: replace the placeholder profile/resume, create projects/<id>/01-facts.yml, then add a JD under jd/inbox/."

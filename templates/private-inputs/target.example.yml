@@ -1,0 +1,25 @@
+target_roles:
+  - AI 产品经理
+  - 大模型产品经理
+  - Agent 产品经理
+
+preferred_locations: []
+platform_priority:
+  - BOSS
+  - 官网/校招官网
+  - 内推
+
+hard_exclusions:
+  keywords:
+    - 销售
+    - 外包
+    - 驻场
+  notes: []
+
+automation_boundary:
+  collect_jd: assisted
+  score_jd: automated
+  tailor_resume: assisted
+  open_apply_page: dry_run_only
+  send_application: manual_confirm_required
+  send_hr_message: manual_confirm_required

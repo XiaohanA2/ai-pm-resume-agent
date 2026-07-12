@@ -1,0 +1,36 @@
+required_fields:
+  - project_id
+  - project_name
+  - fact_status
+  - period
+  - role
+  - confidentiality
+  - ai_pm_pillars
+  - ai_role
+  - owned_scope
+  - evaluation_method
+  - badcase_loop
+  - human_fallback
+  - metrics
+  - action_map
+
+metric_required_fields:
+  - metric_id
+  - claim
+  - value
+  - source
+  - confidence
+  - visibility
+  - evidence_level
+  - resume_allowed
+
+action_required_fields:
+  - action_id
+  - action
+  - why
+  - evidence
+  - evidence_level
+  - resume_allowed
+
+forbidden_fields:
+  - status

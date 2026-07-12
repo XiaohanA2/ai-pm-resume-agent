@@ -1,0 +1,78 @@
+fact_status:
+  - draft
+  - needs_user_check
+  - confirmed
+
+evidence_level:
+  - documented
+  - user_confirmed
+  - inferred
+  - hypothesis
+  - forbidden
+
+visibility:
+  - resume_ok
+  - interview_only
+  - private
+
+rough_status:
+  - unprocessed
+  - extracted
+  - needs_user_check
+  - converted
+
+jd_status:
+  - inbox
+  - analyzed
+  - shortlisted
+  - applied
+  - archived
+
+application_stage:
+  - found
+  - analyzed
+  - shortlisted
+  - tailoring
+  - resume_ready
+  - ready_to_apply
+  - applied
+  - hr_replied
+  - interview_scheduled
+  - interview_1
+  - interview_2
+  - final_interview
+  - offer
+  - accepted
+  - rejected
+  - withdrawn
+  - no_response
+  - archived
+  - frozen
+
+record_status:
+  - active
+  - paused
+  - terminal
+
+confidence:
+  - high
+  - medium
+  - low
+
+match_decision:
+  - apply
+  - review
+  - archive
+
+suggested_action:
+  - archive
+  - save_for_later
+  - apply_generic
+  - tailor_resume
+  - ask_user
+
+resume_priority:
+  - high
+  - medium
+  - low
+  - avoid

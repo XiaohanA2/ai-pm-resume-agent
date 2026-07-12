@@ -1,0 +1,16 @@
+required_fields:
+  - application_id
+  - jd_id
+  - company
+  - position
+  - platform
+  - priority
+  - fit_score
+  - application_stage
+  - record_status
+  - owner_next_action
+  - next_action_date
+
+forbidden_fields:
+  - status
+  - stage

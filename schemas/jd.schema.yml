@@ -1,0 +1,17 @@
+required_frontmatter_fields:
+  - jd_id
+  - source
+  - company
+  - position
+  - location
+  - jd_status
+  - duplicate_key
+  - risk_flags
+  - domain
+  - users
+  - tasks
+  - ai_requirements
+  - metrics
+
+forbidden_fields:
+  - status
