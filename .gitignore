@@ -1,0 +1,20 @@
+# All candidate-specific inputs, evidence, outputs, and project materials stay local.
+evidence/
+market/
+config/profile.yml
+config/target.yml
+profiles/
+projects/
+jd/
+outputs/
+trackers/
+dashboards/
+vendor/
+IMPLEMENTATION_AUDIT.md
+IMPLEMENTATION_STATUS.md
+*.cookie
+*.cookies.json
+*.env
+__pycache__/
+*.pyc
+.DS_Store
