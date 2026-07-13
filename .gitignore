@@ -9,6 +9,7 @@ jd/
 outputs/
 trackers/
 dashboards/
+迁移/
 vendor/
 IMPLEMENTATION_AUDIT.md
 IMPLEMENTATION_STATUS.md
