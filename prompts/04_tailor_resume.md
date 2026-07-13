@@ -8,11 +8,12 @@
 
 读取：
 
-1. `profiles/base_resume.md`
-2. 目标 JD 文件和 `03_score_match` 结果
-3. 推荐项目的 `01-facts.yml`
-4. 推荐项目的 `02-resume-points.md`、`03-storyline.md`、`04-deep-dive.md`、`05-jd-adaptation.md`
-5. `schemas/project_facts.schema.yml`、`schemas/jd.schema.yml`
+1. `prompts/00_chinese_writing_style.md`
+2. `profiles/base_resume.md`
+3. 目标 JD 文件和 `03_score_match` 结果
+4. 推荐项目的 `01-facts.yml`
+5. 推荐项目的 `02-resume-points.md`、`03-storyline.md`、`04-deep-dive.md`、`05-jd-adaptation.md`
+6. `schemas/project_facts.schema.yml`、`schemas/jd.schema.yml`
 
 ## Workflow
 
@@ -86,4 +87,5 @@
 - 不新增学历、证书、年限、实习、项目、上线、获奖、负责人身份。
 - 不写候选人无法解释的技能词。
 - 不因为 JD 写了某词就硬塞进简历；必须有项目证据。
+- 输出前按 `00_chinese_writing_style.md` 做一次语言自检；删掉无证据的抽象收尾和模板化转折，不为了“去 AI 味”牺牲事实准确性。
 - 生成后必须交给 `05_review_resume` 审核，审核未过不能进入 `resume_ready`。

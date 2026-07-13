@@ -8,11 +8,12 @@
 
 读取：
 
-1. 待审核简历 Markdown
-2. 对应 JD 和 match score
-3. `outputs/change_logs/<company-position-date>.md`
-4. 所有被使用项目的 `01-facts.yml`、`03-storyline.md`、`04-deep-dive.md`
-5. `schemas/` 和 `scripts/validate_contracts`
+1. `prompts/00_chinese_writing_style.md`
+2. 待审核简历 Markdown
+3. 对应 JD 和 match score
+4. `outputs/change_logs/<company-position-date>.md`
+5. 所有被使用项目的 `01-facts.yml`、`03-storyline.md`、`04-deep-dive.md`
+6. `schemas/` 和 `scripts/validate_contracts`
 
 ## Review Gates
 
@@ -58,6 +59,8 @@
 - 是否使用市场可理解的产品语言。
 - 是否避免空词：负责、参与、赋能、提升用户体验。
 - 是否避免假精确和无上下文的“显著提升”。
+- 是否有重复的“不是……而是……”、整齐三段式、模板转折或空泛收尾；发现后给出具体原句和改法。
+- 是否把“链路、闭环、沉淀、迭代、推动、提升”等词落到明确对象和证据；不能落地时要求删改。
 
 ### 7. 渲染检查
 

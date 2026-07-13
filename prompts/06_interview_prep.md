@@ -8,11 +8,12 @@
 
 读取：
 
-1. shortlisted JD
-2. 定制简历和 change log
-3. 使用项目的 `01-facts.yml`、`03-storyline.md`、`04-deep-dive.md`
-4. match score 中的 `keyword_evidence_risk_table`
-5. 用户已有逐字稿或面试复盘
+1. `prompts/00_chinese_writing_style.md`
+2. shortlisted JD
+3. 定制简历和 change log
+4. 使用项目的 `01-facts.yml`、`03-storyline.md`、`04-deep-dive.md`
+5. match score 中的 `keyword_evidence_risk_table`
+6. 用户已有逐字稿或面试复盘
 
 ## Required Outputs
 
@@ -36,6 +37,7 @@
 - 不知道就承认，不硬装。
 - 不要只谈技术，必须落到用户价值、业务指标和成本约束。
 - 未确认内容必须显式标注 `[待确认]`。
+- 口语稿要像候选人在回忆实际项目：多用具体对象、当时的判断和动作；少用对仗式转折、宏大结论和无对象的抽象词。
 
 ## AI Project Follow-up
 

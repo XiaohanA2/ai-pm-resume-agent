@@ -8,11 +8,12 @@
 
 优先读取：
 
-1. `schemas/project_facts.schema.yml` 和 `schemas/enums.yml`
-2. `config/profile.yml`、`config/target.yml`
-3. 目标项目目录下的 `00-index.md`、`01-facts.yml`
-4. `evidence/evidence_index.yml`、`evidence/metrics_registry.yml`
-5. 用户提供的 rough 输入、PRD、复盘、逐字稿、聊天记录或旧简历片段
+1. `prompts/00_chinese_writing_style.md`
+2. `schemas/project_facts.schema.yml` 和 `schemas/enums.yml`
+3. `config/profile.yml`、`config/target.yml`
+4. 目标项目目录下的 `00-index.md`、`01-facts.yml`
+5. `evidence/evidence_index.yml`、`evidence/metrics_registry.yml`
+6. 用户提供的 rough 输入、PRD、复盘、逐字稿、聊天记录或旧简历片段
 
 如果材料互相冲突，以 `documented` 原始证据和用户最新确认优先；不确定内容必须进入追问清单。
 
